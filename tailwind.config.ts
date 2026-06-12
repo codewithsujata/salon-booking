@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["var(--font-inter)", "sans-serif"],
+        display: ["var(--font-playfair)", "serif"],
+      },
       colors: {
         rose: {
           50: "#fff1f2",
