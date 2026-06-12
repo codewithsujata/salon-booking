@@ -7,9 +7,12 @@ const DEFAULT_SERVICE_IMAGE = "/default-service.jpg";
 
 async function getServices(): Promise<Service[]> {
   try {
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return [];
+    }
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
     const { data } = await supabase
       .from("services")
