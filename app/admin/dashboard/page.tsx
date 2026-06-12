@@ -246,9 +246,9 @@ export default function Dashboard() {
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center gap-2">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold text-gray-800 truncate">Admin Dashboard</h1>
             <p className="text-sm text-gray-400">Glamour Salon</p>
           </div>
           <div className="flex gap-3 items-center">
@@ -258,12 +258,12 @@ export default function Dashboard() {
             </button>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-4 flex gap-1 border-t">
+        <div className="max-w-6xl mx-auto px-4 flex gap-1 border-t overflow-x-auto scrollbar-none">
           {(["appointments", "customers", "services", "same time"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`px-4 py-2.5 text-sm font-medium capitalize border-b-2 transition ${
+              className={`px-4 py-2.5 text-sm font-medium capitalize border-b-2 transition whitespace-nowrap shrink-0 ${
                 tab === t ? "border-rose-600 text-rose-600" : "border-transparent text-gray-500 hover:text-gray-700"
               }`}
             >
