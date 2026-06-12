@@ -4,21 +4,23 @@ import { supabaseAdmin } from "@/lib/supabase";
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const date = searchParams.get("date");
+  const limit = parseInt(searchParams.get("limit") || "50");
+  const offset = parseInt(searchParams.get("offset") || "0");
 
   try {
     const supabase = supabaseAdmin();
     let query = supabase
       .from("appointments")
-      .select("*")
-      .order("date", { ascending: true })
-      .order("time", { ascending: true });
+      .select("*", { count: "exact" })
+      .order("created_at", { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (date) query = query.eq("date", date);
 
-    const { data, error } = await query;
+    const { data, error, count } = await query;
     if (error) throw error;
 
-    return NextResponse.json({ appointments: data });
+    return NextResponse.json({ appointments: data, total: count });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Server error";
     return NextResponse.json({ error: message }, { status: 500 });
@@ -36,17 +38,31 @@ export async function POST(req: NextRequest) {
 
     const supabase = supabaseAdmin();
 
-    // Check if slot is already taken
-    const { data: existing } = await supabase
-      .from("appointments")
-      .select("id")
-      .eq("date", date)
-      .eq("time", time)
-      .neq("status", "cancelled")
+    // Upsert customer — create new or update name/email and bump booking count
+    const { data: existingCustomer } = await supabase
+      .from("customers")
+      .select("id, total_bookings")
+      .eq("phone", client_phone)
       .maybeSingle();
 
-    if (existing) {
-      return NextResponse.json({ error: "This time slot is no longer available" }, { status: 409 });
+    if (existingCustomer) {
+      await supabase
+        .from("customers")
+        .update({
+          name: client_name,
+          email: client_email || null,
+          total_bookings: existingCustomer.total_bookings + 1,
+          last_booking_at: new Date().toISOString(),
+        })
+        .eq("phone", client_phone);
+    } else {
+      await supabase.from("customers").insert({
+        name: client_name,
+        phone: client_phone,
+        email: client_email || null,
+        total_bookings: 1,
+        last_booking_at: new Date().toISOString(),
+      });
     }
 
     const { data, error } = await supabase

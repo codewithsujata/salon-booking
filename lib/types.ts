@@ -1,10 +1,11 @@
 export type Service = {
   id: string;
   name: string;
-  duration: number; // minutes
+  duration: number | null;
   price: number;
   description: string;
-  icon: string;
+  icon?: string;
+  image_url?: string | null;
 };
 
 export type Appointment = {
@@ -24,4 +25,14 @@ export type Appointment = {
 export type TimeSlot = {
   time: string;
   available: boolean;
+};
+
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string | null;
+  total_bookings: number;
+  created_at: string;
+  last_booking_at: string;
 };

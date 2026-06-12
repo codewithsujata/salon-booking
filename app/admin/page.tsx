@@ -7,44 +7,52 @@ export default function AdminLogin() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    // Store in sessionStorage so dashboard can read it
+    setLoading(true);
+    setError("");
     sessionStorage.setItem("admin_pass", password);
-    // Verify via API
-    fetch("/api/admin/verify", {
+    const r = await fetch("/api/admin/verify", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ password }),
-    }).then((r) => {
-      if (r.ok) router.push("/admin/dashboard");
-      else setError("Wrong password");
     });
+    if (r.ok) router.push("/admin/dashboard");
+    else { setError("Incorrect password"); setLoading(false); }
   }
 
   return (
-    <main className="min-h-screen bg-rose-50 flex items-center justify-center px-4">
-      <div className="bg-white rounded-3xl shadow-sm p-10 max-w-sm w-full text-center">
-        <div className="text-4xl mb-4">💆</div>
-        <h1 className="text-xl font-bold text-gray-800 mb-1">Salon Owner Login</h1>
-        <p className="text-sm text-gray-400 mb-6">Access your appointment dashboard</p>
+    <main className="min-h-screen bg-[#0f0f13] flex items-center justify-center px-6">
+      <div className="w-full max-w-sm">
+        <div className="text-center mb-10">
+          <span className="font-display text-2xl text-white">Glamour</span>
+          <span className="font-display text-2xl text-[#C9A96E]"> Salon</span>
+          <p className="text-white/60 text-sm mt-2 tracking-wider uppercase">Staff Access</p>
+        </div>
+
         <form onSubmit={handleLogin} className="space-y-3">
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Enter password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-rose-400"
+            className="w-full bg-[#16161d] border border-white/20 text-white placeholder-white/60 px-4 py-3.5 text-sm focus:outline-none focus:border-[#C9A96E]/50 transition"
           />
-          {error && <p className="text-red-500 text-sm">{error}</p>}
+          {error && <p className="text-red-400 text-xs tracking-wide">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-rose-600 text-white py-3 rounded-full font-semibold hover:bg-rose-700 transition"
+            disabled={loading || !password}
+            className="w-full bg-[#C9A96E] text-[#0f0f13] py-3.5 text-sm font-semibold tracking-widest uppercase hover:bg-[#E8D5B0] disabled:opacity-40 transition"
           >
-            Login
+            {loading ? "Verifying..." : "Login"}
           </button>
         </form>
+
+        <p className="text-center mt-6">
+          <a href="/" className="text-white/50 hover:text-white text-xs transition">← Back to site</a>
+        </p>
       </div>
     </main>
   );
