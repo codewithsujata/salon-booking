@@ -3,6 +3,8 @@ import Image from "next/image";
 import { createClient } from "@supabase/supabase-js";
 import { Service } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_SERVICE_IMAGE = "/default-service.jpg";
 
 async function getServices(): Promise<Service[]> {
